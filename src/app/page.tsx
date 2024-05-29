@@ -3,7 +3,7 @@
 "use client";
 
 // react imports
-import { FormEvent, useEffect, useCallback, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 // components import
 import Paragraph from "@/components/paragraph/index";
@@ -20,8 +20,7 @@ import { paragraphsType, imagesType, textsType, videosType } from "@/interface";
 
 // Dnd imports
 import type { XYCoord } from "react-dnd";
-import update from "immutability-helper";
-import { useDrag, useDrop } from "react-dnd";
+import { useDrop } from "react-dnd";
 import Swal from "sweetalert2";
 
 export default function Home() {
@@ -120,7 +119,7 @@ export default function Home() {
   useEffect(() => {
     AOS.init({
       duration: 800,
-      once: true,
+      once: false,
     });
   }, []);
 
