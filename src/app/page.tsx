@@ -16,18 +16,13 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 // interfaces imports
-import {
-  paragraphsType,
-  imagesType,
-  textsType,
-  videosType,
-  // DragItem,
-} from "@/interface";
+import { paragraphsType, imagesType, textsType, videosType } from "@/interface";
 
 // Dnd imports
 import type { XYCoord } from "react-dnd";
 import update from "immutability-helper";
 import { useDrag, useDrop } from "react-dnd";
+import Swal from "sweetalert2";
 
 export default function Home() {
   const [width, setWidth] = useState<string>("");
@@ -44,34 +39,83 @@ export default function Home() {
   const [videoSrcForm, setVideoSrcForm] = useState<boolean>(false);
   const [contentForm, setContentForm] = useState<boolean>(false);
 
-  // const moveBox = useCallback(
-  //   (id: string, left: number, top: number) => {
-  //     setImages(
-  //       update(images, {
-  //         [id]: {
-  //           $merge: { left, top },
-  //         },
-  //       })
-  //     );
-  //   },
-  //   [images, setImages]
-  // );
-
-  const [, drop]: any = useDrop(
-    () => ({
-      accept: "box",
-      drop(item: any, monitor) {
-        console.log(item);
-        console.log(monitor);
-        // const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
-        // const left = Math.round(item.left + delta.x);
-        // const top = Math.round(item.top + delta.y);
-        // moveBox(item.id, left, top);
-        // return undefined;
-      },
-    })
-    // [moveBox]
-  );
+  const [, drop]: any = useDrop(() => ({
+    accept: "box",
+    drop(item: any, monitor: any) {
+      const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
+      if (item.paragraph) {
+        const left = Math.round(item.paragraph.left + delta.x);
+        const top = Math.round(item.paragraph.top + delta.y);
+        setParagraphs((prevState) => {
+          prevState.splice(item.index, 1);
+          const newParagraphs = [
+            ...prevState,
+            {
+              content: item.paragraph.content,
+              left: left,
+              top: top,
+            },
+          ];
+          return newParagraphs;
+        });
+      }
+      if (item.text) {
+        const left = Math.round(item.text.left + delta.x);
+        const top = Math.round(item.text.top + delta.y);
+        setTexts((prevState) => {
+          prevState.splice(item.index, 1);
+          const newTexts = [
+            ...prevState,
+            {
+              content: item.text.content,
+              height: item.text.height,
+              width: item.text.width,
+              top: top,
+              left: left,
+            },
+          ];
+          return newTexts;
+        });
+      }
+      if (item.video) {
+        const left = Math.round(item.video.left + delta.x);
+        const top = Math.round(item.video.top + delta.y);
+        setVideos((prevState) => {
+          prevState.splice(item.index, 1);
+          const newVideos = [
+            ...prevState,
+            {
+              src: item.video.src,
+              height: item.video.height,
+              width: item.video.width,
+              top: top,
+              left: left,
+            },
+          ];
+          return newVideos;
+        });
+      }
+      if (item.image) {
+        const left = Math.round(item.image.left + delta.x);
+        const top = Math.round(item.image.top + delta.y);
+        setImages((prevState) => {
+          prevState.splice(item.index, 1);
+          const newImages = [
+            ...prevState,
+            {
+              src: item.image.src,
+              height: item.image.height,
+              width: item.image.width,
+              top: top,
+              left: left,
+            },
+          ];
+          return newImages;
+        });
+      }
+      return undefined;
+    },
+  }));
 
   useEffect(() => {
     AOS.init({
@@ -114,50 +158,94 @@ export default function Home() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (videoSrcForm) {
-      const newVideos = [
-        ...videos,
-        {
-          src: src,
-          height: height,
-          width: width,
-        },
-      ];
-      setVideos(newVideos);
-      handleClose();
+      if (src && height && width) {
+        const newVideos = [
+          ...videos,
+          {
+            src: src,
+            height: height,
+            width: width,
+            top: 0,
+            left: 0,
+          },
+        ];
+        setVideos(newVideos);
+        handleClose();
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: "All Field Required",
+          icon: "error",
+          confirmButtonText: "ok",
+        });
+      }
     }
     if (imageSrcForm) {
-      const newImage = [
-        ...images,
-        {
-          src: src,
-          height: height,
-          width: width,
-        },
-      ];
-      setImages(newImage);
-      handleClose();
+      if (src && height && width) {
+        const newImage = [
+          ...images,
+          {
+            src: src,
+            height: height,
+            width: width,
+            top: 0,
+            left: 0,
+          },
+        ];
+        setImages(newImage);
+        handleClose();
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: "All Field Required",
+          icon: "error",
+          confirmButtonText: "ok",
+        });
+      }
     }
     if (contentForm && !sizeForm) {
-      const newParagraph = [
-        ...paragraphs,
-        {
-          content: content,
-        },
-      ];
-      setParagraphs(newParagraph);
-      handleClose();
+      if (content) {
+        const newParagraph = [
+          ...paragraphs,
+          {
+            content: content,
+            top: 0,
+            left: 0,
+          },
+        ];
+        setParagraphs(newParagraph);
+        handleClose();
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: "All Field Required",
+          icon: "error",
+          confirmButtonText: "ok",
+        });
+      }
     }
     if (contentForm && sizeForm) {
-      const newText = [
-        ...texts,
-        {
-          content: content,
-          height: height,
-          width: width,
-        },
-      ];
-      setTexts(newText);
-      handleClose();
+      if (content && height && width) {
+        const newText = [
+          ...texts,
+          {
+            content: content,
+            height: height,
+            width: width,
+            top: 0,
+            left: 0,
+          },
+        ];
+        setTexts(newText);
+        handleClose();
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: "All Field Required",
+          icon: "error",
+          confirmButtonText: "ok",
+        });
+      }
     }
   };
 
@@ -173,19 +261,21 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center gap-x-24 gap-y-6">
             <div
               ref={drop}
-              className="w-8/12 lg:h-96 h-60 bg-white overflow-auto rounded-3xl shadow-2xl shadow-black"
+              className="w-8/12 lg:h-96 h-60 bg-white relative overflow-auto rounded-3xl shadow-2xl shadow-black"
             >
               {videos.map((video, index) => {
-                return <Video key={index} video={video} />;
+                return <Video key={index} video={video} index={index} />;
               })}
               {texts.map((text, index) => {
-                return <Text key={index} text={text} />;
+                return <Text key={index} text={text} index={index} />;
               })}
               {paragraphs.map((paragraph, index) => {
-                return <Paragraph key={index} paragraph={paragraph} />;
+                return (
+                  <Paragraph key={index} paragraph={paragraph} index={index} />
+                );
               })}
               {images.map((image, index) => {
-                return <Image key={index} image={image} />;
+                return <Image key={index} image={image} index={index} />;
               })}
             </div>
             <div className="w-4/12 lg:h-96 h-96 flex lg:mb-0 mb-12 flex-col justify-around gap-x-24 gap-y-6">
