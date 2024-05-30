@@ -1,10 +1,15 @@
 "use client";
 
+import { videosType } from "@/interface";
 import { useDrag } from "react-dnd";
 
-export default function Video(props) {
-  const { video, index } = props;
-  const [{ isDragging }, drag] = useDrag(
+interface props {
+  video: videosType;
+  index: number;
+}
+
+export default function Video({ video, index }: props) {
+  const [{ isDragging }, drag]: any = useDrag(
     () => ({
       type: "box",
       item: { video, index },

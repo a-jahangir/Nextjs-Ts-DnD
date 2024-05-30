@@ -1,10 +1,15 @@
 "use client";
 
+import { textsType } from "@/interface";
 import { useDrag } from "react-dnd";
 
-export default function Text(props) {
-  const { text, index } = props;
-  const [{ isDragging }, drag] = useDrag(
+interface props {
+  text: textsType;
+  index: number;
+}
+
+export default function Text({ text, index }:props) {
+  const [{ isDragging }, drag]:any = useDrag(
     () => ({
       type: "box",
       item: { text, index },

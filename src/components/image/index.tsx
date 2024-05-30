@@ -1,11 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { imagesType } from "@/interface";
 import { useDrag } from "react-dnd";
 
-export default function Image(props) {
-  const { image, index } = props;
-  const [{ isDragging }, drag] = useDrag(
+interface props {
+  image: imagesType;
+  index: number;
+}
+
+export default function Image({ image, index }: props) {
+  const [{ isDragging }, drag]:any = useDrag(
     () => ({
       type: "box",
       item: { image, index },

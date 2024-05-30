@@ -1,10 +1,15 @@
 "use client";
 
+import { paragraphsType } from "@/interface";
 import { useDrag } from "react-dnd";
 
-export default function Paragraph(props) {
-  const { paragraph, index } = props;
-  const [{ isDragging }, drag] = useDrag(
+interface props {
+  paragraph: paragraphsType;
+  index: number;
+}
+
+export default function Paragraph({ paragraph, index }: props) {
+  const [{ isDragging }, drag]: any = useDrag(
     () => ({
       type: "box",
       item: { paragraph, index },
